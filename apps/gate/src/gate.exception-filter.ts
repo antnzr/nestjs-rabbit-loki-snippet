@@ -8,13 +8,12 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ErrorResponse } from './dto';
-import { IRpcException } from '../../../libs/common/src/errors';
 
 @Catch()
 export class GateExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(GateExceptionsFilter.name);
 
-  catch(exception: IRpcException, host: ArgumentsHost): void {
+  catch(exception: any, host: ArgumentsHost): void {
     this.logger.error(exception.message);
 
     const context = host.switchToHttp();

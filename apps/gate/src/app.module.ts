@@ -25,14 +25,9 @@ import { GateExceptionsFilter } from './gate.exception-filter';
       useFactory: (config: ConfigService) => {
         const env = config.get<string>('NODE_ENV');
         const level = env === 'production' ? 'info' : 'debug';
-        const transport =
-          env === 'development'
-            ? { target: 'pino-pretty', options: { singleLine: true } }
-            : undefined;
         return {
           pinoHttp: {
             level,
-            transport,
             base: undefined,
             name: 'GATE',
             redact: ['req.headers.authorization'],

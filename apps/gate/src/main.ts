@@ -30,7 +30,6 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('App REST API gate')
-    .setBasePath('/api/v1')
     .setDescription('App REST API gate')
     .setVersion('1.0')
     .build();

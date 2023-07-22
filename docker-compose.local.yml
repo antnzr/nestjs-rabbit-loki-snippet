@@ -1,28 +1,27 @@
 version: '3.8'
-x-logging:
-  &logging
+x-logging: &logging
   logging:
     driver: loki
     options:
-      loki-url: "http://host.docker.internal:3100/loki/api/v1/push"
+      loki-url: 'http://host.docker.internal:3100/loki/api/v1/push'
       max-size: 50m
       max-file: 5
 services:
   loki:
     image: grafana/loki
     container_name: loki
-    user: "${UID}:${GID}"
+    user: '${UID}:${GID}'
     ports:
       - 3100:3100
     volumes:
       - ./loki:/loki
       - ./loki-config.yml:/etc/loki/loki-config.yml
-    command: "-target=all,table-manager -config.file=/etc/loki/loki-config.yml"
+    command: '-target=all,table-manager -config.file=/etc/loki/loki-config.yml'
     logging:
       driver: none
     restart: always
     networks:
-      micro_net:
+      infra_net:
   promtail:
     image: grafana/promtail
     container_name: promtail
@@ -36,11 +35,11 @@ services:
       driver: none
     restart: always
     networks:
-      micro_net:
+      infra_net:
   grafana:
     image: grafana/grafana
     container_name: grafana
-    user: "${UID}:${GID}"
+    user: '${UID}:${GID}'
     ports:
       - 3033:3000
     depends_on:
@@ -53,22 +52,54 @@ services:
       driver: none
     restart: always
     networks:
-      micro_net:
+      infra_net:
   rabbit:
     image: rabbitmq:3.10-management-alpine
     container_name: rabbit
     env_file: ./.env
     volumes:
       - /var/lib/rabbitmq
+    logging:
+      driver: none
     environment:
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error}]
     ports:
       - 5672:5672
       - 15672:15672
     networks:
-      - micro_net
+      - app_net
+    restart: unless-stopped
+  gate:
+    build:
+      context: .
+      dockerfile: Dockerfile.gate
+    container_name: gate
+    env_file:
+      - .env
+    ports:
+      - 4433:4433
+    depends_on:
+      - rabbit
+      - task
+    networks:
+      - app_net
+    restart: unless-stopped
+
+  task:
+    build:
+      context: .
+      dockerfile: Dockerfile.task
+    container_name: task
+    env_file:
+      - .env
+    depends_on:
+      - rabbit
+    networks:
+      - app_net
     restart: unless-stopped
 
 networks:
-  micro_net:
-    name: micro_net
+  app_net:
+    name: app_net
+  infra_net:
+    name: infra_net

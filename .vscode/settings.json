@@ -1,0 +1,15 @@
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1"
+    },
+    "local": {
+      "url": "http://localhost:4433/api/v1"
+    },
+    "stage": {
+      "url": "https://"
+    }
+  },
+  "rest-client.previewOption": "exchange",
+  "rest-client.enableTelemetry": false
+}

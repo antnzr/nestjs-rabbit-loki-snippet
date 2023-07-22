@@ -1,0 +1,4 @@
+@baseUrl = {{url}}
+
+# @name greeting
+GET {{baseUrl}}

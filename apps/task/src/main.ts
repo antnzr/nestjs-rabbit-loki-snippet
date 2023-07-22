@@ -11,6 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
   app.enableShutdownHooks();
 
   const logger = app.get(Logger);
@@ -31,7 +32,9 @@ async function bootstrap() {
   );
 
   const rmqService = app.get<RmqService>(RmqService);
-  app.connectMicroservice(rmqService.getOptions(TASK_QUEUE));
+  app.connectMicroservice(rmqService.getOptions(TASK_QUEUE), {
+    inheritAppConfig: true,
+  });
   await app.startAllMicroservices();
 
   logger.log('🚀 TASK app is running');

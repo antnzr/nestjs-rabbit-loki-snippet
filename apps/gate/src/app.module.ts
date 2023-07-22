@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from './config.schema';
 import { LoggerModule } from 'nestjs-pino';
 import { TASK_QUEUE } from '../../../libs/common/src/constants';
+import { APP_FILTER } from '@nestjs/core';
+import { GateExceptionsFilter } from './gate.exception-filter';
 
 @Module({
   imports: [
@@ -23,9 +25,14 @@ import { TASK_QUEUE } from '../../../libs/common/src/constants';
       useFactory: (config: ConfigService) => {
         const env = config.get<string>('NODE_ENV');
         const level = env === 'production' ? 'info' : 'debug';
+        const transport =
+          env === 'development'
+            ? { target: 'pino-pretty', options: { singleLine: true } }
+            : undefined;
         return {
           pinoHttp: {
             level,
+            transport,
             base: undefined,
             name: 'GATE',
             redact: ['req.headers.authorization'],
@@ -36,6 +43,12 @@ import { TASK_QUEUE } from '../../../libs/common/src/constants';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GateExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}

@@ -23,9 +23,14 @@ import { GATE_QUEUE } from '../../../libs/common/src/constants';
       useFactory: (config: ConfigService) => {
         const env = config.get<string>('NODE_ENV');
         const level = env === 'production' ? 'info' : 'debug';
+        const transport =
+          env === 'development'
+            ? { target: 'pino-pretty', options: { singleLine: true } }
+            : undefined;
         return {
           pinoHttp: {
             level,
+            transport,
             base: undefined,
             name: 'TASK',
             redact: ['req.headers.authorization'],

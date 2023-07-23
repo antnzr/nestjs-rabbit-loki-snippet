@@ -19,7 +19,7 @@ services:
     command: '-target=all,table-manager -config.file=/etc/loki/loki-config.yml'
     logging:
       driver: none
-    restart: always
+    restart: unless-stopped
     networks:
       infra_net:
   promtail:
@@ -33,7 +33,7 @@ services:
     command: -config.file=/etc/promtail/promtail-config.yml
     logging:
       driver: none
-    restart: always
+    restart: unless-stopped
     networks:
       infra_net:
   grafana:
@@ -50,7 +50,7 @@ services:
       - ./grafana:/var/lib/grafana
     logging:
       driver: none
-    restart: always
+    restart: unless-stopped
     networks:
       infra_net:
   rabbit:

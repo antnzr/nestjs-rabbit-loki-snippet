@@ -37,7 +37,7 @@ wait_rabbit() {
 
 up_containers() {
   log "up containers"
-  docker-compose -f $COMPOSE_FILE up --build --remove-orphans
+  docker-compose -f $COMPOSE_FILE up -d --build --remove-orphans
 }
 
 run() {
